@@ -11,11 +11,32 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return view
     }()
     
+    private lazy var nameField: UITextField = {
+        let view = UITextField()
+        view.placeholder = "Имя"
+        return view
+    }()
+    
+    private lazy var numberField: UITextField = {
+        let view = UITextField()
+        view.placeholder = "Номер"
+        return view
+    }()
+    
+    private lazy var buttonToAdd: UIButton = {
+        let view = UIButton()
+        view.setTitle("+", for: .normal)
+        view.setTitleColor(.black, for: .normal)
+        view.addTarget(nil, action: #selector(addContact(sender:)), for: .touchUpInside)
+        view.backgroundColor = .systemGray
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSubviews()
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addContact))
+
         self.tableView.reloadData()
     }
     
@@ -34,8 +55,32 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private func setupSubviews(){
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview().offset(view.frame.height / 5)
+            make.left.bottom.right.equalToSuperview()
         }
+        
+        view.addSubview(nameField)
+        nameField.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(view.frame.height / 10)
+            make.height.equalToSuperview().multipliedBy(0.05)
+            make.left.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.6)
+        }
+        view.addSubview(numberField)
+        numberField.snp.makeConstraints { make in
+            make.top.equalTo(nameField.snp.bottom)
+            make.height.equalToSuperview().multipliedBy(0.05)
+            make.left.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.6)
+        }
+        view.addSubview(buttonToAdd)
+        buttonToAdd.snp.makeConstraints { make in
+            make.left.equalTo(nameField.snp.right)
+            make.width.equalToSuperview().multipliedBy(0.4)
+            make.bottom.equalTo(numberField)
+            make.top.equalTo(numberField)
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -55,40 +100,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         return cell
     }
-    
-    
-    @objc func addContact(){
-        let alert = UIAlertController(title: "Добавить контакт", message: "Введите данные", preferredStyle: .alert)
-        
-        alert.addTextField { field in
-            field.placeholder = "Имя"
-            field.returnKeyType = .next
-            field.keyboardType = .namePhonePad
-        }
-        
-        alert.addTextField { field in
-            field.placeholder = "Номер"
-            field.returnKeyType = .next
-            field.keyboardType = .numberPad
-        }
-        
-        alert.addAction(UIAlertAction(title: "Отменить", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { _ in
-            guard let fields = alert.textFields, fields.count == 2 else {
-                    return
-                }
-            let nameField = fields[0]
-            let numberField = fields[1]
-            
-            guard let name1 = nameField.text , !name1.isEmpty,
-                  let number1 = numberField.text, !number1.isEmpty else{
-                      print("Ошибка")
-                      return
-                  }
-            self.friends.append("\(name1)")
-            self.numbers.append("\(number1)")
-            self.tableView.reloadData()
-        }))
-        present(alert, animated: true)
+    @objc func addContact(sender: UIButton) {
+        let name1 = nameField.text
+        let number1 = numberField.text
+        friends.append("\(name1!)")
+        numbers.append("\(number1!)")
+        tableView.reloadData()
     }
+        
+
 }
